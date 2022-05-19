@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "177325171018",
+    "project_id": "rumi-a4b79",
+    "storage_bucket": "rumi-a4b79.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:177325171018:android:e832a194b7609e1999e1b3",
+        "android_client_info": {
+          "package_name": "com.rumi.example"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "177325171018-89d5rkihc0bjh15pbv3gd8o7s2q39aq4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCKRouXBLXYStxtCmT9iZPubmVx6YnJzIs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "177325171018-89d5rkihc0bjh15pbv3gd8o7s2q39aq4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

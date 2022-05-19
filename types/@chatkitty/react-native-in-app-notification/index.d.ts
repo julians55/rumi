@@ -1,0 +1,1 @@
+declare module '@chatkitty/react-native-in-app-notification';
