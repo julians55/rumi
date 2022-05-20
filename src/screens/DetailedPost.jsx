@@ -8,9 +8,19 @@ import Routes from "../navigation/Routes";
 import ChatScreen from "./ChatScreen";
 import HomeStack from "../navigation/HomeStack";
 import { ChatStack } from "../navigation/HomeStack";
+import Rumi from '../../assets/Rumi.png'
+import Geocoder from 'react-native-geocoding';
+import MapView, { Marker, PROVIDER_GOOGLE} from 'react-native-maps';
 import { kitty } from "../chatkitty";
 const DetailedPost = ({route ,navigation}) => {
 const {number} = route.params;
+const [latitude, setLatitud] = useState(0);
+const [longitude, setLongitude] = useState(0);
+
+const latDelta = 0.0222;
+const lonDelta = 0.021;
+Geocoder.init("AIzaSyBOwM2XjFQrhLTyIUExPJRxJbxQ1y7Kfjk");
+
 const [posts, setPosts] = useState([]);
   const [refreshData, setRefreshData] = useState(false);
   useEffect(() => {
@@ -41,13 +51,23 @@ const [posts, setPosts] = useState([]);
         });
         setPosts(myData);
         console.log(myData);
+        Geocoder.from(myData[0].locality)
+  .then(json => {
+    var location = json.results[0].geometry.location;
+    console.log(location);
+    setLatitud(location.lat);
+    setLongitude(location.lng);
+    console.log(latitude);
+  })
+  .catch(error => console.warn(error));
       })
       .catch((error) => {
         console.log("Error getting data: ", error);
       });
   };
-
+  
   const Item = ({ title, cost, image, locality, neighborhood, description, userId}) => (
+    
     <View style={{
       display: 'flex',
       marginBottom: 10,
@@ -57,7 +77,7 @@ const [posts, setPosts] = useState([]);
       borderStyle: "solid",
       borderRadius: 6,
       marginLeft:'3.5%',
-   
+      marginTop: 20,
       shadowRadius:0.2,
       shadowColor: "#000",
       shadowOffset: {
@@ -72,6 +92,16 @@ const [posts, setPosts] = useState([]);
       height: 500
     
     }}>
+      <MapView style={{flex: 1,width:300, height: 300}} provider={PROVIDER_GOOGLE} region={{
+      latitude: latitude,
+      longitude: longitude,
+      latitudeDelta: latDelta,
+      longitudeDelta: lonDelta,
+    }}>
+          <Marker coordinate={{latitude: latitude, longitude: longitude,}}>
+
+          </Marker>
+        </MapView>
       <Text style={styles.textUs}>
         {title}
       </Text>
@@ -97,22 +127,23 @@ const [posts, setPosts] = useState([]);
       </TouchableOpacity>
     </View>
   );
-  console.log(posts[0]);
+
+ 
   const renderItem = ({ item }) => (
     <Item title={item.title} cost={item.cost} image={item.image} locality={item.locality} neighborhood={item.neighborhood} description={item.description} userId={item.userId} />
   );
 
   return (
-    <><Titles style={styles.text}>RUMI</Titles><View style={styles.postsContainer}>
+    <><Image source={Rumi} style={{width:150, height:75, resizeMode: 'contain',marginTop: 7,marginBottom: 17, marginLeft: '29%'}}/><View style={styles.postsContainer}>
 
 
    
       <Button title="Atras" color="#D24D30" onPress={() => {
           navigation.goBack();
         }}/>
-      <View style={styles.bar}>
-    
-      </View>
+      
+      
+   
       <FlatList
         data={posts}
         renderItem={renderItem}
