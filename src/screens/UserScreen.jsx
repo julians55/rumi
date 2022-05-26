@@ -9,8 +9,9 @@ import { AuthContext } from '../navigation/AuthProvider';
 import { Titles } from '../../styles/AddPost';
 import { useEffect } from 'react';
 import { kitty } from '../chatkitty';
+import Rumi from '../../assets/Rumic.png';
 import { NavigationRouteContext } from '@react-navigation/native';
-export default function userScreen() {
+export default function userScreen({ navigation }) {
   const [posts, setPosts] = useState([]);
   const [refreshData, setRefreshData] = useState(false);
   const{user} = useContext(AuthContext);
@@ -18,12 +19,11 @@ export default function userScreen() {
     getPosts();
   }, [refreshData]);
 
-  const getPosts = async () => {
-    await firebase
+  const getPosts =  () => {
+    const suscriber = firebase
       .firestore()
       .collection("posts").where("userId","==",user.id)
-      .get()
-      .then((snapshot) => {
+      .onSnapshot((snapshot) => {
         let myData = [];
         snapshot.forEach((doc) => {
           const places = doc.data();
@@ -37,6 +37,7 @@ export default function userScreen() {
         });
         setPosts(myData);
       })
+      return () => suscriber()
       .catch((error) => {
         console.log("Error getting data: ", error);
       });
@@ -56,7 +57,8 @@ Alert.alert(
       <Text style={styles.text}>
         {title} - {'$'+cost}
       </Text>
-      <Button color={"#5b3a70"} title={"editar"} ></Button>
+      <Button color={"#5b3a70"} title={"  editar  "} onPress={()=>navigation.navigate('Details',{number: postId})}></Button>
+      <Text />
       <Button color={"#5b3a70"} title={"eliminar"} onPress={()=>deletePost(postId)}></Button>
     </View>
   );
@@ -66,11 +68,10 @@ Alert.alert(
   );
 
   return (
-    <><Titles style={styles.textUs}>Tus publicaciones</Titles><View style={styles.postsContainer}>
+    <><Titles style={styles.textUs}><Image source={Rumi} style={{width:60, height:60, resizeMode: 'contain',marginLeft: '-78%', marginRight: '10%'}}/>Tus publicaciones</Titles><View style={styles.postsContainer}>
+      <Button title="cerrar sesion" onPress={() => kitty.endSession()} />
 
       <View style={styles.viewButtons}>
-      <Button title="Recargar" onPress={() => setRefreshData(!refreshData)} />
-      <Button title="cerrar sesion" onPress={() => kitty.endSession()} />
       </View>
       <View style={styles.bar}>
 
@@ -110,9 +111,12 @@ const styles = StyleSheet.create({
   },
   text:{
     marginTop: '1%',
+    marginBottom: '2%'
   },
   textUs:{
-    marginTop: '10%',
+    marginTop: '2%',
+    paddingBottom:3
+    
   }
 });
   

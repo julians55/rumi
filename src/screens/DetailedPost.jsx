@@ -1,25 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { firebase } from "../firebase";
-import { View, Text, FlatList, Image, Button, TouchableOpacity } from "react-native";
+import { ScrollView, View, Text, FlatList, Image, Button, TouchableOpacity } from "react-native";
 import { StyleSheet } from "react-native";
-import { Titles } from "../../styles/AddPost";
-import Intl from "intl";
-import Routes from "../navigation/Routes";
-import ChatScreen from "./ChatScreen";
-import HomeStack from "../navigation/HomeStack";
-import { ChatStack } from "../navigation/HomeStack";
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Rumi from '../../assets/Rumi.png'
 import Geocoder from 'react-native-geocoding';
 import MapView, { Marker, PROVIDER_GOOGLE} from 'react-native-maps';
 import { kitty } from "../chatkitty";
 const DetailedPost = ({route ,navigation}) => {
+
 const {number} = route.params;
 const [latitude, setLatitud] = useState(0);
 const [longitude, setLongitude] = useState(0);
 
 const latDelta = 0.0222;
 const lonDelta = 0.021;
-Geocoder.init("AIzaSyBOwM2XjFQrhLTyIUExPJRxJbxQ1y7Kfjk");
+Geocoder.init("API_KEY");
 
 const [posts, setPosts] = useState([]);
   const [refreshData, setRefreshData] = useState(false);
@@ -46,19 +43,21 @@ const [posts, setPosts] = useState([]);
             description: places.description,
             cost: places.cost,
             locality: places.locality,
-            neighborhood: places.neighborhood
+            neighborhood: places.neighborhood,
+            rules: places.rules
           });
         });
         setPosts(myData);
-        console.log(myData);
-        Geocoder.from(myData[0].locality)
-  .then(json => {
-    var location = json.results[0].geometry.location;
-    console.log(location);
-    setLatitud(location.lat);
-    setLongitude(location.lng);
-    console.log(latitude);
-  })
+        console.log("Bogota, "+myData[0].locality+", "+myData[0].neighborhood)
+
+        Geocoder.from("Bogota, "+myData[0].locality+", "+myData[0].neighborhood)
+        .then(json => {
+          var location = json.results[0].geometry.location;
+          console.log(location);
+          setLatitud(location.lat);
+          setLongitude(location.lng);
+          console.log(latitude);
+        })
   .catch(error => console.warn(error));
       })
       .catch((error) => {
@@ -66,18 +65,17 @@ const [posts, setPosts] = useState([]);
       });
   };
   
-  const Item = ({ title, cost, image, locality, neighborhood, description, userId}) => (
+  const Item = ({ title, cost, image, locality, neighborhood, description, rules}) => (
     
-    <View style={{
+    <ScrollView contentContainerStyle={{alignItems:'center',}}style={{
       display: 'flex',
-      marginBottom: 10,
-      alignItems: 'center',
-      justifyContent: 'center',
+      
+      marginBottom: 90,
       backgroundColor: '#D7CFFA',
       borderStyle: "solid",
       borderRadius: 6,
       marginLeft:'3.5%',
-      marginTop: 20,
+      marginTop: 10,
       shadowRadius:0.2,
       shadowColor: "#000",
       shadowOffset: {
@@ -89,30 +87,35 @@ const [posts, setPosts] = useState([]);
   
       elevation: 5,
       width:'93%',
-      height: 500
+      height: 900
     
     }}>
-      <MapView style={{flex: 1,width:300, height: 300}} provider={PROVIDER_GOOGLE} region={{
-      latitude: latitude,
-      longitude: longitude,
-      latitudeDelta: latDelta,
-      longitudeDelta: lonDelta,
-    }}>
-          <Marker coordinate={{latitude: latitude, longitude: longitude,}}>
-
-          </Marker>
-        </MapView>
-      <Text style={styles.textUs}>
-        {title}
+      
+      <Text style={styles.textUsTitle}>
+        {title} 
       </Text>
-      <Image source={{uri: image}} style={{width:'91%', height:260, marginTop:3}}/>
-      <Text style={styles.textUs}>
+      <Image source={{uri: image}} style={{width:'91%', height:200, marginTop:3}}/>
+      <Text style={styles.textUsDescription}>
         {description}
       </Text>
+      <MaterialCommunityIcons style={{marginTop:'25%'}}name={rules.smoke?'cigar':'cigar-off'} size={24} color="black" /><Text style={styles.textUsDescription}>{rules.smoke?'Se permite fumar':'No se permite fumar'}</Text>
+      <MaterialCommunityIcons name={rules.pets?'paw':'paw-off'} size={24} color="black" /><Text style={styles.textUsDescription}>{rules.pets?'Se permiten mascotas':'No se permiten mascotas'}</Text>
+      <MaterialCommunityIcons name={rules.schedule?'clock-time-ten':'timer-off'} size={24} color="black" /><Text style={styles.textUsDescription}>{rules.schedule?'Hay restriccion de horario':'No hay restriccion de horario'}</Text>
+      <Text style={{fontWeight:"800", marginBottom: 10}}>Precio: {'$'+cost}</Text>
       <Text style={styles.textUs}>
-        {neighborhood}, {locality} - {'$'+cost}
+        {neighborhood}, {locality} 
       </Text>
-      <TouchableOpacity style={{ height: 20, marginTop: 10 }} 
+      <MapView style={{flex: 1,width:300, height: 200}} provider={PROVIDER_GOOGLE} region={{
+        latitude: latitude,
+        longitude: longitude,
+        latitudeDelta: latDelta,
+        longitudeDelta: lonDelta,
+      }}>
+        <Marker coordinate={{latitude: latitude, longitude: longitude,}}>
+        <Image source={require('../../assets/Rumir.png')} style={{height: 85, width:85 }} />
+        </Marker>
+      </MapView>
+      <TouchableOpacity style={{paddingTop:'1.5%', height: 30, marginTop: 10, marginBottom: 10, backgroundColor: "#8277A9", borderStyle: 'solid', borderRadius: 6,}} 
       onPress={()=>{
         kitty
         .createChannel({
@@ -123,18 +126,20 @@ const [posts, setPosts] = useState([]);
           navigation.navigate('Chat', { channel: result.channel });
         });
         }}>
-       <Text>Ir a mensaje</Text>
+          
+       <Text style={{color: "white"}}>  Ir a mensaje <Ionicons name="chatbubbles-outline" size={15} color="white" />  </Text>
       </TouchableOpacity>
-    </View>
+      
+    </ScrollView>
   );
 
  
   const renderItem = ({ item }) => (
-    <Item title={item.title} cost={item.cost} image={item.image} locality={item.locality} neighborhood={item.neighborhood} description={item.description} userId={item.userId} />
+    <Item title={item.title} cost={item.cost} image={item.image} locality={item.locality} neighborhood={item.neighborhood} description={item.description} userId={item.userId} rules={item.rules} />
   );
 
   return (
-    <><Image source={Rumi} style={{width:150, height:75, resizeMode: 'contain',marginTop: 7,marginBottom: 17, marginLeft: '29%'}}/><View style={styles.postsContainer}>
+    <><Image source={Rumi} style={{width:150, height:75, resizeMode: 'contain',marginTop: 18,marginBottom: 17, marginLeft: '30%'}}/><View style={styles.postsContainer}>
 
 
    
@@ -157,7 +162,7 @@ const styles = StyleSheet.create({
   postsContainer: {
     backgroundColor: '#2e64e515',
     height: '100%',
-    marginTop: '-7%',
+    marginTop: '-8%',
   },
   bar: {
     display: 'flex',
@@ -190,6 +195,27 @@ const styles = StyleSheet.create({
   },
   textUs:{
     marginTop: '0.4%',
+    fontFamily: 'Pacifico',
+    fontWeight: '1100',
+    marginLeft:12,
+    marginRight:12,
+    marginBottom:5
+  },
+  textUsTitle:{
+    marginTop: '0.4%',
+    marginBottom: 5,
+    fontFamily: 'PacificoBold',
+    marginLeft:12,
+    marginRight:12,
+    fontSize: 17,
+  },
+  textUsDescription:{
+    marginTop: 10,
+    marginBottom: 20,
+    fontFamily: 'Pacifico',
+    marginLeft:12,
+    marginRight:12,
+    fontWeight: "600"
   },
   btnStyle: {
     color: '#2e64e515',

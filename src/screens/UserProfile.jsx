@@ -1,26 +1,31 @@
 import React, { useState, useEffect, useContext } from "react";
 import { firebase } from "../firebase";
-import { View, Text, FlatList, Image, Button,TouchableOpacity } from "react-native";
+import { View, Text, FlatList, Image, Button,TouchableOpacity, TextInput } from "react-native";
 import { StyleSheet } from "react-native";
 import { Titles } from "../../styles/AddPost";
 import { AuthContext } from "../navigation/AuthProvider";
-import PostDetails from "./PostDetails";
-import { NavigationContainer } from "@react-navigation/native";
-import { kitty } from "../chatkitty";
+import Rumi from '../../assets/Rumir.png';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import RNPickerSelect from "react-native-picker-select";
+
 const UserProfile = ({ navigation }) => {
   const [posts, setPosts] = useState([]);
   const [refreshData, setRefreshData] = useState(false);
+  const [locality, setLocality] = useState(null);
+  const [min, setMin] = useState(null);
+  const [max, setMax] = useState(null);
+
   const{user} = useContext(AuthContext);
   useEffect(() => {
     getPosts();
-  }, [refreshData]);
+  }, [locality, min, max]);
+
+  const Query = firebase.firestore().collection("posts").where("userId","!=",user.id)
+  const userQuery = locality?firebase.firestore().collection("posts").where('locality','==',locality).where('userId',"!=",user.id):Query
   
   const getPosts = () => {
-    firebase
-      .firestore()
-      .collection("posts").where("userId","!=",user.id)
-      .get()
-      .then((snapshot) => {
+    const suscriber = userQuery
+      .onSnapshot((snapshot) => {
         let myData = [];
         snapshot.forEach((doc) => {
           const places = doc.data();
@@ -37,30 +42,34 @@ const UserProfile = ({ navigation }) => {
             neighborhood: places.neighborhood,
           });
         });
-        setPosts(myData);
-        console.log(myData);
+        const B = myData.filter(function (element) {
+          if(min&&!max){return element.cost > min}
+          if(!min&&max){return element.cost < max}
+          if(!min&&!max){return element.cost >0}
+          if(min&&max){return element.cost > min && element.cost < max}
+      });
+
+        setPosts(B);
+        
       })
+      return() => suscriber()
       .catch((error) => {
         console.log("Error getting data: ", error);
       });
   };
 
-const deletePost = () => {
-  
-}
-
   const Item = ({ title, cost, image, locality, neighborhood, postId  }) => (
     <View style={styles.bar}>
-      <Text style={styles.textUs}>
+      <Text style={styles.textUsTitle}>
         {title}
       </Text>
       <Image source={{uri: image}} style={{width:'91%', height:200, marginTop:3}}/>
-      <Text style={styles.textUs}>
+      <Text style={styles.textUsDescription}>
         {neighborhood}, {locality} - {'$'+cost}
       </Text>
-      <TouchableOpacity style={{ height: 20, marginTop: 10 }} 
+      <TouchableOpacity style={{ height: 20, marginTop: 10, marginBottom: 10, backgroundColor: "#8277A9", borderStyle: 'solid', borderRadius: 6, }} 
       onPress={()=>navigation.navigate('Details',{number: postId})}>
-       <Text>Detalles</Text>
+       <Text style={{color: "white"}}> Detalles <Ionicons name="enter-outline" size={15} color="white" /> </Text>
       </TouchableOpacity>
     </View>
   );
@@ -70,13 +79,41 @@ const deletePost = () => {
   );
 
   return (
-    <><Titles style={styles.text}>Hola de nuevo, {user.displayName}</Titles><View style={styles.postsContainer}>
-
-    
-   
-      <Button title="Recargar" color="#D24D30" onPress={() => setRefreshData(!refreshData)} />
-      <View style={styles.bar}>
-    
+    <><Titles style={styles.text}><Image source={Rumi} style={{width:80, height:80, resizeMode: 'contain',marginTop:-50, marginLeft: '-38%', marginRight: '20%'}}/>Hola de nuevo, {user.displayName}</Titles><View style={styles.postsContainer}>
+      <View style={styles.filter}>
+            <RNPickerSelect
+                placeholder={{ label: "Todas las localidades", value: null, color:'black' }}
+                onValueChange={(locality) =>{setRefreshData(true), setLocality(locality)}}
+                items={[
+                    { label: "Teusaquillo", value: "Teusaquillo" },
+                    { label: "Rafael Uribe Uribe", value: "Rafael Uribe Uribe" },
+                    { label: "Kennedy", value: "Kennedy" },
+                    { label: "Usme", value: "Usme" },
+                    { label: "Engativa", value: "Engativa" },
+                    { label: "Fontibon", value: "Fontibon" },
+                    { label: "Antonio Nariño", value: "Antonio Nariño" },
+                    { label: "Chapinero", value: "Chapinero" },
+                    { label: "Santa Fe", value: "Santa Fe" },
+                    { label: "Puente Aranda", value: "Puente Aranda" },
+                    { label: "Barrios Unidos", value: "Barrios Unidos" },
+                    { label: "Suba", value: "Suba" },
+                ]}
+                style={pickerSelectStyles}
+            />
+            <View style={styles.filterSearch}>
+              <Text style={{marginLeft:'20%', marginTop:-11, marginBottom:5}}>$ </Text>
+            <TextInput placeholder="Precio Minimo" 
+              style={{ marginRight:18, marginTop:-15, marginBottom:5}}
+              value={min}
+              onChangeText={(content) => {setMin(parseInt(content))}}
+            />
+            <Text style={{marginTop:-11, marginBottom:5}}>$ </Text>
+            <TextInput placeholder="Precio Maximo" 
+              style={{marginRight:'18%', marginTop:-15, marginBottom:5}}
+              value={max}
+              onChangeText={(content)=> { setMax(parseInt(content))}}
+            />
+            </View>
       </View>
       <FlatList
         data={posts}
@@ -87,11 +124,46 @@ const deletePost = () => {
 };
 
 export default UserProfile;
+const pickerSelectStyles = StyleSheet.create({
+  inputIOS: {
+    fontSize: 14,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: 'green',
+    borderRadius: 8,
+    color: 'black',
+    paddingRight: 30, // to ensure the text is never behind the icon
+  },
+  inputAndroid: {
+    alignItems: 'center',
+    alignContent:'center',
+    marginLeft:35,
+    marginRight:35,
+    marginTop:-5,
+    fontSize: 24,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderColor: 'blue',
+    borderRadius: 8,
+    color: 'black',
+    paddingRight: 30, // to ensure the text is never behind the icon
+  },
+});
 const styles = StyleSheet.create({
   postsContainer: {
     backgroundColor: '#2e64e515',
-    height: '90%',
-    marginTop: '-7%',
+    height: '87%',
+    marginTop: '-8%',
+  },
+  filter:{
+    grid: 1,
+  },
+  filterSearch:{
+    display:'flex',
+    flexDirection: 'row'
+
   },
   bar: {
     display: 'flex',
@@ -119,10 +191,28 @@ const styles = StyleSheet.create({
     flexDirection: 'row'
   },
   text:{
-    marginTop: '10%',
+    marginTop: '0%',
+    marginLeft:'-12%',
+  
   },
   textUs:{
     marginTop: '0.4%',
+  },
+  textUsTitle:{
+    marginTop: '0.4%',
+    marginBottom: 5,
+    fontFamily: 'PacificoBold',
+    marginLeft:12,
+    marginRight:12,
+    fontSize: 17,
+  },
+  textUsDescription:{
+    marginTop: 10,
+    marginBottom: 1,
+    fontSize:15,
+    fontFamily: 'Pacifico',
+    marginLeft:12,
+    marginRight:12,
   },
   btnStyle: {
     color: '#2e64e515',

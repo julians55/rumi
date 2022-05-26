@@ -2,7 +2,7 @@ import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeStack from "./HomeStack";
 import AuthStack from "./AuthStack";
-
+import EditPostStack from "./EditPostStack";
 import PostStack from "./PostStack";
 import UserProfile from "../screens/UserProfile";
 import userScreen from "../screens/UserScreen";
@@ -39,7 +39,7 @@ const BottomTabNavigator = () => {
             <Ionicons name="ios-chatbox-ellipses-outline" size={size} color={color} />
           )
         }}/>
-        <Tab.Screen name="Perfil" component={userScreen} options={{
+        <Tab.Screen name="Perfil" component={EditPostStack} options={{
           title: "Perfil",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="ios-happy-outline" size={size} color={color} />

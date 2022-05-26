@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Image } from 'react-native';
 import { IconButton, Title } from 'react-native-paper';
-
+import Rumi from '../../assets/Rumir.png';
 import { kitty } from '../chatkitty';
 import FormButton from '../components/FormButton';
 import FormInput from '../components/FormInput';
@@ -31,7 +31,7 @@ export default function CreateChannelScreen({ navigation }) {
           />
         </View>
         <View style={styles.innerContainer}>
-          <Title style={styles.title}>Crear un nuevo grupo</Title>
+          <Title style={styles.title}><Image source={Rumi} style={{width:50, height:50, resizeMode: 'contain',marginTop:-50, marginLeft: '-58%', marginRight: '20%'}}/>Crea un nuevo grupo</Title>
           <FormInput
               labelName="Nombre del grupo"
               value={channelName}

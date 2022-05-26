@@ -1,4 +1,5 @@
 import React, {useState, useContext, useEffect} from 'react';
+import RNPickerSelect from "react-native-picker-select";
 import {
   ScrollView,
   Text,
@@ -6,13 +7,13 @@ import {
   StyleSheet,
   Alert,
   Image,
-  Button,
-  FlatList,
   ActivityIndicator,
+  Switch,
+  View
 } from 'react-native';
 import ActionButton from 'react-native-action-button';
 import Icon from 'react-native-vector-icons/Ionicons';
-import storage from '@react-native-firebase/storage';
+import Rumi from '../../assets/Rumir.png';
 import { firebase } from '../firebase/index';
 import * as ImagePicker from "expo-image-picker";
 import {
@@ -41,6 +42,12 @@ const AddPostScreen = () => {
   const [cost, setCost] = useState(null);
   const [locality, setLocality] = useState(null);
   const [neighborhood, setNeighborhood] = useState(null);
+  const [isEnabledPets, setIsEnabledPets] = useState(false);
+  const toggleSwitchPets = () => setIsEnabledPets(previousState => !previousState);
+  const [isEnabledSmoke, setIsEnabledSmoke] = useState(false);
+  const toggleSwitchSmoke = () => setIsEnabledSmoke(previousState => !previousState);
+  const [isEnabledSchedule, setIsEnabledSchedule] = useState(false);
+  const toggleSwitchSchedule = () => setIsEnabledSchedule(previousState => !previousState);
 
   useEffect(() =>{
     (async()=>{
@@ -112,6 +119,7 @@ const AddPostScreen = () => {
           locality: locality,
           neighborhood: neighborhood,
           cost: cost,
+          rules: {"pets": isEnabledPets, "smoke": isEnabledSmoke, "schedule": isEnabledSchedule}
         })
         .then(() => {
           console.log('Post Added!');
@@ -119,12 +127,7 @@ const AddPostScreen = () => {
             'Publicacion realizada!',
             'Tu inmueble fue exitosamente publicado!',
           );
-          setPost(null);
-          setImage(null);
-          setCost(null);
-          setTitle(null);
-          setNeighborhood(null);
-          setLocality(null);
+          
         })
         .catch((error) => {
           console.log('Something went wrong with added post to firestore.', error);
@@ -138,16 +141,18 @@ const AddPostScreen = () => {
     setCost(null);
     setNeighborhood(null);
     setLocality(null);
+    setIsEnabledPets(false);
+    setIsEnabledSchedule(false);
+    setIsEnabledSmoke(false);
   }
 
   
 
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', gap: 30 }}>
-      
       <InputWrapper style={{    borderStyle: 'dotted',
     borderColor: 'green',}}>
-      <Titles style={{marginTop:'9%'}}>A un paso de tu proximo Rumi!</Titles>
+      <Titles style={{marginTop:'9%'}}><Image source={Rumi} style={{width:65, height:65, resizeMode: 'contain',marginTop:-50, marginLeft: '-78%', marginRight: '10%'}}/>A un paso de tu Rumi!</Titles>
 
       <SubmitBtn2 onPress={pickImage}>
             <SubmitBtnText2>Agregar Imagen</SubmitBtnText2>
@@ -171,16 +176,57 @@ const AddPostScreen = () => {
           value={post}
           onChangeText={(content) => setPost(content)}
         />
+         <View style={styles.containerSwitch}>
+      <Text>Se permiten mascotas</Text>
+      <Text>NO<Switch
+        trackColor={{ false: "#767577", true: "#8277A9" }}
+        thumbColor={isEnabledPets ? "white" : "white"}
+        ios_backgroundColor="#3e3e3e"
+        onValueChange={toggleSwitchPets}
+        value={isEnabledPets}
+      />SI</Text>
+       <Text style={{marginTop:15}}>Se permite fumar</Text>
+       <Text>NO<Switch
+        trackColor={{ false: "#767577", true: "#8277A9" }}
+        thumbColor={isEnabledSmoke ? "white" : "white"}
+        ios_backgroundColor="#3e3e3e"
+        onValueChange={toggleSwitchSmoke}
+        value={isEnabledSmoke}
+      />SI</Text>
+       <Text style={{marginTop:15}}>Sin restriccion de horario</Text>
+       <Text>NO<Switch
+        trackColor={{ false: "#767577", true: "#8277A9" }}
+        thumbColor={isEnabledSchedule ? "white" : "white"}
+        ios_backgroundColor="#3e3e3e"
+        onValueChange={toggleSwitchSchedule}
+        value={isEnabledSchedule}
+      />SI</Text>
+    </View>
         <Icon
           name='chevron-down-outline'
           color='#000'
           size={14}
         />
-        <InputField
-          placeholder="Ingresa la localidad"
-          value={locality}
-          onChangeText={(content) => setLocality(content)}
-        />
+        <RNPickerSelect
+                placeholder={{ label: "Ingresa la localidad", value: null }}
+                onValueChange={(locality) => setLocality(locality)}
+                items={[
+                    { label: "Teusaquillo", value: "Teusaquillo" },
+                    { label: "Rafael Uribe Uribe", value: "Rafael Uribe Uribe" },
+                    { label: "Kennedy", value: "Kennedy" },
+                    { label: "Usme", value: "Usme" },
+                    { label: "Engativa", value: "Engativa" },
+                    { label: "Fontibon", value: "Fontibon" },
+                    { label: "Antonio Nariño", value: "Antonio Nariño" },
+                    { label: "Chapinero", value: "Chapinero" },
+                    { label: "Santa Fe", value: "Santa Fe" },
+                    { label: "Puente Aranda", value: "Puente Aranda" },
+                    { label: "Barrios Unidos", value: "Barrios Unidos" },
+                    { label: "Suba", value: "Suba" },
+                ]}
+                style={pickerSelectStyles}
+
+            />
         <Icon
           name='chevron-down-outline'
           color='#000'
@@ -212,7 +258,7 @@ const AddPostScreen = () => {
             <ActivityIndicator size="large" color="#0000ff" />
           </StatusWrapper>
         ) : (
-          <SubmitBtn onPress={submitPost}>
+          <SubmitBtn style={{marginBottom: 10}}onPress={submitPost}>
             <SubmitBtnText>Publicar</SubmitBtnText>
           </SubmitBtn>
         )}
@@ -224,13 +270,44 @@ const AddPostScreen = () => {
 };
 
 export default AddPostScreen;
-
+const pickerSelectStyles = StyleSheet.create({
+  inputIOS: {
+    fontSize: 14,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: 'green',
+    borderRadius: 8,
+    color: 'black',
+    paddingRight: 30, // to ensure the text is never behind the icon
+  },
+  inputAndroid: {
+    alignItems: 'center',
+    alignContent:'center',
+    marginLeft:35,
+    marginRight:35,
+    fontSize: 24,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderColor: 'blue',
+    borderRadius: 8,
+    color: 'black',
+    paddingRight: 30, // to ensure the text is never behind the icon
+  },
+});
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
     marginTop: 30,
 
+  },
+  containerSwitch: {
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: "center",
+    justifyContent: "center"
   },
   actionButtonIcon: {
     fontSize: 20,

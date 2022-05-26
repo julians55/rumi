@@ -19,17 +19,30 @@ export default function HomeScreen({ navigation }) {
   const isFocused = useIsFocused();
 
   function handleLeaveChannel() {
+    if(leaveChannel.type == "PUBLIC"){
     kitty.leaveChannel({ channel: leaveChannel }).then(() => {
       setLeaveChannel(null);
   
       kitty.getChannels({ filter: { joined: true } }).then((result) => {
         setChannels(result.paginator.items);
       });
-    });
+    });console.log(channels.user);
   }
+  else{
+    kitty.deleteChannel({ channel: leaveChannel }).then(() => {
+      setLeaveChannel(null);
+  
+      kitty.getChannels({ filter: { joined: true } }).then((result) => {
+        setChannels(result.paginator.items);
+      });
+    });console.log(channels.user);
+  }
+  }
+  
   
 function handleDismissLeaveChannel() {
   setLeaveChannel(null);
+
 }
 
   useEffect(() => {
@@ -53,7 +66,7 @@ function handleDismissLeaveChannel() {
   if (loading) {
     return <Loading />;
   }
-
+  
   return (
       <View style={styles.container}>
         <FlatList

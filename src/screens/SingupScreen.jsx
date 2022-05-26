@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Image } from 'react-native';
 import { IconButton, Title } from 'react-native-paper';
-
+import Rumi from '../../assets/Rumic.png';
 import FormButton from '../components/FormButton';
 import FormInput from '../components/FormInput';
 import Loading from '../components/Loading';
@@ -23,7 +23,8 @@ export default function SignupScreen({ navigation }) {
   
     return (
         <View style={styles.container}>
-          <Title style={styles.titleText}>Unete a RUMI!</Title>
+          <Title style={styles.titleText}>Unete!
+          <Image source={Rumi} style={{width:60, height:60, resizeMode: 'contain',marginLeft: '-78%', marginRight: '10%'}}/></Title>
           <FormInput
               labelName="Nombre"
               value={displayName}
@@ -55,7 +56,7 @@ export default function SignupScreen({ navigation }) {
               onChangeText={(userPassword) => setPassword(userPassword)}
           />
           <FormButton
-              title="Signup"
+              title="Registrar"
               modeValue="contained"
               labelStyle={styles.loginButtonLabel}
               onPress={() => register(displayName, email, password )}
