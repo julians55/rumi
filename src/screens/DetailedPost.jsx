@@ -16,7 +16,7 @@ const [longitude, setLongitude] = useState(0);
 
 const latDelta = 0.0222;
 const lonDelta = 0.021;
-Geocoder.init("API_KEY");
+Geocoder.init("AIzaSyBOwM2XjFQrhLTyIUExPJRxJbxQ1y7Kfjk");
 
 const [posts, setPosts] = useState([]);
   const [refreshData, setRefreshData] = useState(false);
@@ -87,7 +87,7 @@ const [posts, setPosts] = useState([]);
   
       elevation: 5,
       width:'93%',
-      height: 900
+      height: 1030
     
     }}>
       
@@ -98,7 +98,10 @@ const [posts, setPosts] = useState([]);
       <Text style={styles.textUsDescription}>
         {description}
       </Text>
-      <MaterialCommunityIcons style={{marginTop:'25%'}}name={rules.smoke?'cigar':'cigar-off'} size={24} color="black" /><Text style={styles.textUsDescription}>{rules.smoke?'Se permite fumar':'No se permite fumar'}</Text>
+      
+      <MaterialCommunityIcons style={{marginTop:'10%'}}name={rules.smoke?'cigar':'cigar-off'} size={24} color="black" /><Text style={styles.textUsDescription}>{rules.smoke?'Se permite fumar':'No se permite fumar'}</Text>
+      <MaterialCommunityIcons name={rules.parking?'parking':'parking'} size={24} color="black" /><Text style={styles.textUsDescription}>{rules.pets?'Hay parqueadero':'NO hay parqueadero'}</Text>
+      <MaterialCommunityIcons name={rules.private?'bathtub':'bathtub'} size={24} color="black" /><Text style={styles.textUsDescription}>{rules.pets?'Hay baño privado':'NO baño privado'}</Text>
       <MaterialCommunityIcons name={rules.pets?'paw':'paw-off'} size={24} color="black" /><Text style={styles.textUsDescription}>{rules.pets?'Se permiten mascotas':'No se permiten mascotas'}</Text>
       <MaterialCommunityIcons name={rules.schedule?'clock-time-ten':'timer-off'} size={24} color="black" /><Text style={styles.textUsDescription}>{rules.schedule?'Hay restriccion de horario':'No hay restriccion de horario'}</Text>
       <Text style={{fontWeight:"800", marginBottom: 10}}>Precio: {'$'+cost}</Text>

@@ -51,6 +51,10 @@ const AddPostScreen = ({route, navigation}) => {
   const toggleSwitchSmoke = () => setIsEnabledSmoke(previousState => !previousState);
   const [isEnabledSchedule, setIsEnabledSchedule] = useState(false);
   const toggleSwitchSchedule = () => setIsEnabledSchedule(previousState => !previousState);
+  const [isEnabledParking, setIsEnabledParking] = useState(false);
+  const toggleSwitchParking = () => setIsEnabledParking(previousState => !previousState);
+  const [isEnabledPrivate, setIsEnabledPrivate] = useState(false);
+  const toggleSwitchPrivate = () => setIsEnabledPrivate(previousState => !previousState);
 
   useEffect(() =>{
     (async()=>{
@@ -165,7 +169,7 @@ const AddPostScreen = ({route, navigation}) => {
           locality: locality,
           neighborhood: neighborhood,
           cost: cost,
-          rules: {"pets": isEnabledPets, "smoke": isEnabledSmoke, "schedule": isEnabledSchedule}
+          rules: {"pets": isEnabledPets, "smoke": isEnabledSmoke, "schedule": isEnabledSchedule, "parking": isEnabledParking, "private": isEnabledPrivate}
         })
         .then(() => {
           console.log('Post Updated!');
@@ -190,7 +194,8 @@ const AddPostScreen = ({route, navigation}) => {
     setIsEnabledPets(false);
     setIsEnabledSchedule(false);
     setIsEnabledSmoke(false);
-    
+    setIsEnabledPrivate(false);
+    setIsEnabledParking(false);
       navigation.goBack();
   }
 
@@ -232,6 +237,22 @@ const AddPostScreen = ({route, navigation}) => {
             value={post}
             onChangeText={(content) => setPost(content)} />
           <View style={styles.containerSwitch}>
+          <Text>Posibilidad de parqueadero</Text>
+          <Text>NO<Switch
+            trackColor={{ false: "#767577", true: "#8277A9" }}
+            thumbColor={isEnabledParking ? "white" : "white"}
+            ios_backgroundColor="#3e3e3e"
+            onValueChange={toggleSwitchParking}
+            value={isEnabledParking}
+          />SI</Text>
+          <Text>Baño privado</Text>
+          <Text>NO<Switch
+            trackColor={{ false: "#767577", true: "#8277A9" }}
+            thumbColor={isEnabledPrivate ? "white" : "white"}
+            ios_backgroundColor="#3e3e3e"
+            onValueChange={toggleSwitchPrivate}
+            value={isEnabledPrivate}
+          />SI</Text>
             <Text>Se permiten mascotas</Text>
             <Text>NO<Switch
               trackColor={{ false: "#767577", true: "#8277A9" }}
@@ -274,6 +295,7 @@ const AddPostScreen = ({route, navigation}) => {
               { label: "Puente Aranda", value: "Puente Aranda" },
               { label: "Barrios Unidos", value: "Barrios Unidos" },
               { label: "Suba", value: "Suba" },
+              { label: "Usaquen", value: "Usaquen" },
             ]}
             style={pickerSelectStyles} />
           <Icon

@@ -1,10 +1,10 @@
 {
   "devToolsPort": 19002,
   "expoServerPort": null,
-  "packagerPort": null,
-  "expoServerNgrokUrl": null,
-  "packagerNgrokUrl": null,
-  "ngrokPid": null,
+  "packagerPort": 19000,
+  "expoServerNgrokUrl": "https://xj-86y.julians55.rumi.exp.direct",
+  "packagerNgrokUrl": "https://xj-86y.julians55.rumi.exp.direct",
+  "ngrokPid": 13480,
   "packagerPid": null,
   "webpackServerPort": null
 }
