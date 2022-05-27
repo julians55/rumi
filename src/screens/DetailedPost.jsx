@@ -16,7 +16,7 @@ const [longitude, setLongitude] = useState(0);
 
 const latDelta = 0.0222;
 const lonDelta = 0.021;
-Geocoder.init("AIzaSyBOwM2XjFQrhLTyIUExPJRxJbxQ1y7Kfjk");
+Geocoder.init("API_KEY");
 
 const [posts, setPosts] = useState([]);
   const [refreshData, setRefreshData] = useState(false);
